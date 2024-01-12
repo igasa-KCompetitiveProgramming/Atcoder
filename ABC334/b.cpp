@@ -13,22 +13,24 @@ bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfi
 int main(){
     ll a,m,l,r;
     cin >> a >> m >> l >> r;
-    ll la=l;
-    ll ra=r;
-    la -= a;
-    ra -= a;
-
-
-    if(la%m != 0){
-        if(la>0) la += m-(la%m);
-        else la += la%m;
-    }
-
-    if(l!=r){
-        cout << ((ra-la)/m)+1; 
-    }else if(l%m == 0){
-        cout << 1;
+    l -= a;
+    r -= a;
+    ll ans = 0;
+    if(l<0){
+        ans -= l/m;
     }else{
-        cout << 0;
+        ans -= l/m;
     }
+    if(r<0){
+        ans += r/m;
+    }else{  
+        ans += r/m;
+    }   
+
+    if((l%m==0&&l>0)||(r%m==0&&r<0)||(l<=0&&r>=0)){
+        cout << abs(ans) + 1 << endl;
+    }else{
+        cout << abs(ans) << endl;
+    }
+    
 }
