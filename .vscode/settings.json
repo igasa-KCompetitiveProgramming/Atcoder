@@ -9,6 +9,8 @@
         "vector": "cpp",
         "string_view": "cpp",
         "span": "cpp",
-        "stacktrace": "cpp"
+        "stacktrace": "cpp",
+        "cmath": "cpp",
+        "iostream": "cpp"
     }
 }
