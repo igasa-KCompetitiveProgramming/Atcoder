@@ -24,14 +24,16 @@ int main(){
     int checkPoint = 0;
     rep(i,q){
         if(query[i][0] == 1){
-            checkPoint -= query[i][1];
+            checkPoint += query[i][1];
+            checkPoint %= n;
         }else{
-            int ans = query[i][1] - abs(checkPoint)%n;
-            ans--;
-            if(ans < 0){
-                ans = n + ans;
+            if(query[i][1] - checkPoint <= 0){
+                //cout << query[i][1] << "-" << checkPoint << "+" << n << endl;
+                cout << s[query[i][1] - checkPoint + n - 1] << endl;
+            }else{
+                //cout << query[i][1] - checkPoint - 1 << endl;
+                cout << s[query[i][1] - checkPoint - 1] << endl;
             }
-            cout << s[ans] << endl;
         }
     }
 }
