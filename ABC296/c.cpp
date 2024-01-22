@@ -1,52 +1,35 @@
-#include <cstdio>
-#include <iostream>
-#include <string>
-#include <cmath> 
-#include <set>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-int main(void){
-    int n;
-    int x;
-    int a[200000];
-    bool check = true;
+using ll = long long;
+using ull = unsigned long long;
+using pint = pair<int,int>;
+using pll = pair<long long, long long>;
+
+#define rep(i, n) for (int i = 0; i < (int)(n); i++)
+#define rep1(i,n) for (int i = 1; i <= (int)(n); i++)
+#define YesNo(bool) if(bool) cout << "Yes" << endl; else cout << "No" << endl 
+#define YESNO(bool) if(bool) cout << "YES" << endl; else cout << "NO" << endl 
+int inf = 2147483647; // おおよそ2*10^9
+ll INF = 9223372036854775807; //おおよそ9*10^18
+//ull UINF == おおよそ1.8*10^19
+bool compare(pint& p1, pint& p2){return p1.second < p2.second;}
+bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfirstをsort
+//bool compare(all_of(check.begin(), check.end(), [](bool x){return x;}))//全ての要素がtrueならtrueを返す
+int main(){
+    ll n,x;
     cin >> n >> x;
-    for(int i=0;i<n;i++){
+    vector<ll> a(n);
+    rep(i,n){
         cin >> a[i];
     }
-    sort(a,a+n);
 
-    int mainasuA;
-    if(a[0]<0){
-        mainasuA = -a[0];
-    }else{
-        mainasuA = a[0];
-    }
+    sort(a.begin(), a.end());
 
-    int* help1 = lower_bound(a, a+n, x+a[0])-1;
-    if(x==0){
-        cout << "Yes";
-        check = false;
-    }else if(*help1-mainasuA==x){
-        cout << "Yes";
-        check = false;
-    }else{
-        for(int i=1;i<n;i++){
-            if(a[i]<0){
-                mainasuA = -a[i];
-            }else{
-                mainasuA = a[i];
-            }
-            int* help2 = lower_bound(help1,a+n,x+mainasuA)-1;
-            help1++;
-            if(*help2-a[i]==x){
-                cout << "Yes";
-                check = false;
-                break;    
-            }
+    rep(i,n){
+        if(binary_search(a.begin(), a.end(), x+a[i])){
+            cout << "Yes" << endl;
+            return 0;
         }
     }
-
-    if(check)
-    cout << "No";
+    cout << "No" << endl;
 }
