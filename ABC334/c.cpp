@@ -11,5 +11,34 @@ using pll = pair<long long, long long>;
 bool compare(pint& p1, pint& p2){return p1.second < p2.second;}
 bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfirstをsort
 int main(){
-    cout << -2%3;
+    ll n,k;
+    cin >> n >> k;
+    vector<ll> a(k);
+    rep(i,k){
+        cin >> a[i];
+    }
+    ll ans = 0;
+    if(k==1){
+        cout << 0;
+        return 0;
+    }
+    if(k%2==0){
+        rep(i,k/2){
+            ans += a[2*i+1] - a[2*i];
+        }
+    }else{
+        int tmp = 0;
+        int diff = 0;
+        rep(i,k-1){
+            if(diff < a[i+1] - a[i]){
+                diff = a[i+1] - a[i];
+                tmp = i;
+            }
+        }
+        a.erase(a.begin()+tmp);
+        rep(i,k/2){
+            ans += a[2*i+1] - a[2*i];
+        }
+    }
+    cout << ans << endl;
 }
