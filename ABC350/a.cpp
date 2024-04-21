@@ -18,22 +18,11 @@ bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfi
 int main(){
     string s;
     cin >> s;
-        if(s[3]>'3'){
-            cout << "No";
-            return 0;
-        }else if(s[3]=='3'){
-            if(s[4]>='5'){
-                cout << "No";
-                return 0;
-            }
-        }
-        if(s[3] == '3'&&s[4]=='1'&&s[5]=='6'){
-            cout << "No";
-            return 0;
-        }
-        if(s[3] == '0'&&s[4]=='0'&&s[5]=='0'){
-            cout << "No";
-            return 0;
-        }
+    string t = s.substr(3,3);
+    int n = stoi(t);
+    if(n==0 || n==316 || n>349){
+        cout << "No";
+        return 0;
+    }
     cout << "Yes";
 }
