@@ -32,8 +32,7 @@ int main(){
             cout << 0 << endl;
             continue;
         }
-        ll waru = (n[i]-m[i])/(m[i]-k[i])+1;
-        ll tmp = n[i]-waru*(m[i]-k[i]);
+        ll tmp = n[i]-((n[i]-m[i])/(m[i]-k[i]+1))*(m[i]-k[i]);
         ll tmp2 = tmp%4;
         cout << a[tmp2] << endl;
     }
