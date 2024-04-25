@@ -38,24 +38,19 @@ int main(){
         leftSum[i+1] += leftSum[i];
     }
     for(int i=n-1;i>0;i--){
-        if(s[i] == '1'&& i%2 == 0){
+        if(s[i] == '0'&& i%2 == 0){
             rightSum[i-1] += c[i];
-        }else if(s[i] == '0' && i%2 == 1){
+        }else if(s[i] == '1' && i%2 == 1){
             rightSum[i-1] += c[i];
         }
         rightSum[i-1] += rightSum[i];
     }
     rep(i,n-1){
         ans = min(ans, leftSum[i+1] + rightSum[i]);
-        cout << ans << " ";
     }
-    cout << endl;
     rep(i,n){
-        cout << leftSum[i] << " ";
-    }
-    cout << endl;
-    rep(i,n){
-        cout << rightSum[i] << " ";
+        leftSum[i] = 0;
+        rightSum[i] = 0;
     }
     rep(i,n-1){
         if(s[i] == '0'&& i%2 == 0){
@@ -66,26 +61,15 @@ int main(){
         leftSum[i+1] += leftSum[i];
     }
     for(int i=n-1;i>0;i--){
-        if(s[i] == '0'&& i%2 == 0){
+        if(s[i] == '1'&& i%2 == 0){
             rightSum[i-1] += c[i];
-        }else if(s[i] == '1' && i%2 == 1){
+        }else if(s[i] == '0' && i%2 == 1){
             rightSum[i-1] += c[i];
         }
         rightSum[i-1] += rightSum[i];
     }
-    cout << endl;
     rep(i,n-1){
-        ans = min(ans, leftSum[i] + rightSum[i-1]);
-        cout << ans << " ";
+        ans = min(ans, leftSum[i+1] + rightSum[i]);
     }
-    cout << endl;
-    rep(i,n){
-        cout << leftSum[i] << " ";
-    }
-    cout << endl;
-    rep(i,n){
-        cout << rightSum[i] << " ";
-    }
-    cout << endl;
     cout << ans;
 }
