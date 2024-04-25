@@ -6,7 +6,7 @@ using pint = pair<int,int>;
 using pll = pair<long long, long long>;
 
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
-#define rep1(i,n) for (int i = 1; i <= (int)(n); i++)
+#define rep1(i,n) for (int i = 1; i < (int)(n); i++)
 #define YesNo(bool) if(bool) cout << "Yes" << endl; else cout << "No" << endl 
 #define YESNO(bool) if(bool) cout << "YES" << endl; else cout << "NO" << endl 
 int inf = 2147483647; // おおよそ2*10^9
@@ -24,74 +24,68 @@ int main(){
     rep(i,n){
         cin >> c[i];
     }
-    vector<ll> left01(n);
-    vector<ll> right01(n);
-    vector<ll> left10(n);
-    vector<ll> right10(n);
-    if(s[0] == '0'){
-        left01[0] = c[0];
-    }else{
-        left10[0] = c[0];
-    }
-    if(s[n-1] == '0'){
-        right01[n-1] = c[n-1];
-    }else{
-        right10[n-1] = c[n-1];
-    }
-    rep1(i,n-1){
-        left01[i] = left01[i-1];
-        left10[i] = left10[i-1];
-        if(s[i] == '0'){
-            if(i%2 == 0){
-                left01[i] += c[i];
-            }else{
-                left10[i] += c[i];
-            }
-        }else{
-            if(i%2 == 0){
-                left10[i] += c[i];
-            }else{
-                left01[i] += c[i];
-            }
-        }
-    }
-    for(int i = n-2;n-1<=0;i--){
-        right01[i] = right01[i+1];
-        right10[i] = right10[i+1];
-        if(s[i] == '0'){
-            if(i%2 == 0){
-                right01[i] += c[i];
-            }else{
-                right10[i] += c[i];
-            }
-        }else{
-            if(i%2 == 0){
-                right10[i] += c[i];
-            }else{
-                right01[i] += c[i];
-            }
-        }
-    }
+    vector<ll> leftSum(n);
+    vector<ll> rightSum(n);
     ll ans = INF;
-    rep(i,n){
-        cout << left01[i] << " ";
+    leftSum[0] = 0;
+    rightSum[n-1] = 0;
+    rep(i,n-1){
+        if(s[i] == '1'&& i%2 == 0){
+            leftSum[i+1] += c[i];
+        }else if(s[i] == '0' && i%2 == 1){
+            leftSum[i+1] += c[i];
+        }
+        leftSum[i+1] += leftSum[i];
+    }
+    for(int i=n-1;i>0;i--){
+        if(s[i] == '1'&& i%2 == 0){
+            rightSum[i-1] += c[i];
+        }else if(s[i] == '0' && i%2 == 1){
+            rightSum[i-1] += c[i];
+        }
+        rightSum[i-1] += rightSum[i];
+    }
+    rep(i,n-1){
+        ans = min(ans, leftSum[i+1] + rightSum[i]);
+        cout << ans << " ";
     }
     cout << endl;
     rep(i,n){
-        cout << left10[i] << " ";
+        cout << leftSum[i] << " ";
     }
     cout << endl;
     rep(i,n){
-        cout << right01[i] << " ";
+        cout << rightSum[i] << " ";
     }
-    cout << endl;
-    rep(i,n){
-        cout << right10[i] << " ";
+    rep(i,n-1){
+        if(s[i] == '0'&& i%2 == 0){
+            leftSum[i+1] += c[i];
+        }else if(s[i] == '1' && i%2 == 1){
+            leftSum[i+1] += c[i];
+        }
+        leftSum[i+1] += leftSum[i];
+    }
+    for(int i=n-1;i>0;i--){
+        if(s[i] == '0'&& i%2 == 0){
+            rightSum[i-1] += c[i];
+        }else if(s[i] == '1' && i%2 == 1){
+            rightSum[i-1] += c[i];
+        }
+        rightSum[i-1] += rightSum[i];
     }
     cout << endl;
     rep(i,n-1){
-        ans = min(INF,left01[i-1]+right10[i]);
-        ans = min(ans,left10[i-1]+right01[i]);
+        ans = min(ans, leftSum[i] + rightSum[i-1]);
+        cout << ans << " ";
     }
-    cout << ans << endl;
+    cout << endl;
+    rep(i,n){
+        cout << leftSum[i] << " ";
+    }
+    cout << endl;
+    rep(i,n){
+        cout << rightSum[i] << " ";
+    }
+    cout << endl;
+    cout << ans;
 }
