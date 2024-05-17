@@ -16,44 +16,22 @@ bool compare(pint& p1, pint& p2){return p1.second < p2.second;}
 bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfirstをsort
 //bool compare(all_of(check.begin(), check.end(), [](bool x){return x;}))//全ての要素がtrueならtrueを返す
 int main(){
-    ll n,m;
-    cin >> n >> m;
-    vector<ll> a(m),b(m);
-    vector<vector<ll>> friendList(n);
-    rep(i,m){
-        cin >> a[i] >> b[i];
-        friendList[a[i]-1].push_back(b[i]-1);
-        friendList[b[i]-1].push_back(a[i]-1);
-    }
-    vector<bool> seen(n,false);
-    vector<ll> bondNum;
+    ll n;
+    cin >> n;
+    vector<ll> a(n);
+    rep(i,n) cin >> a[i];
+    vector<ll> check;
     rep(i,n){
-        if(seen[i]) continue;
-        vector<ll> check;
-        seen[i] = true;
-        ll cnt = 0;
-        cnt++;
-        check.push_back(i);
+        check.push_back(a[i]);
         while(true){
-            if(check.size()==0){
-                bondNum.push_back(cnt);
+            if(check.size() == 1) break;
+            if(check[check.size()-1] == check[check.size()-2]){
+                check[check.size()-2] ++;
+                check.pop_back();
+            }else{
                 break;
-            }
-            seen[i] = true;
-            ll now = check[check.size()-1];
-            check.pop_back();
-            for(auto x: friendList[now]){
-                if(seen[x]) continue;
-                seen[x] = true;
-                check.push_back(x);
-                cnt++;
             }
         }
     }
-    ll ans = 0;
-    rep(i,bondNum.size()){
-        ans += bondNum[i]*(bondNum[i]-1)/2;
-    }
-    ans -= m;
-    cout << ans << endl;
+    cout << check.size() << endl;
 }
