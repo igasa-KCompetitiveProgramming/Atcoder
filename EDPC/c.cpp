@@ -16,16 +16,27 @@ bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfi
 int main() {
     int n;
     cin >> n;
-    vector<int> a(n),b(n),c(n);
+    vector<vector<int>> a(3,vector<int> (n,0));
     rep(i,n){
-        cin >> a[i] >> b[i] >> c[i];
+        rep(j,3){
+            cin >> a[j][i];
+        }
     }
-    vector<vector<int>> dp(3,vector<int> (3,0));
-    dp[0][0] = a[0];
-    dp[1][0] = b[0];
-    dp[2][0] = c[0];
-    rep(i,n-1){
-        dp[0][i+1] = max(dp[1][i]+a[i+1],dp[2][i]+a[i+1]);
+    vector<vector<int>> dp(3,vector<int> (n+1,0));
+    dp[0][0] = 0;
+    dp[1][0] = 0;
+    dp[2][0] = 0;
+    rep(i,n){
+        rep(j,3){
+            rep(k,3){
+                if(j != k) dp[j][i+1] = max(dp[j][i+1],dp[k][i]+a[k][i]);
+            }
+        }
     }
+    int ans = 0;
+    rep(i,3){
+        ans = max(ans,dp[i][n]);
+    }
+    cout << ans << endl;
     return 0;
 }
