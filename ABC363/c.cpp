@@ -16,5 +16,23 @@ bool compare(pint& p1, pint& p2){return p1.second < p2.second;}
 bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfirstをsort
 //bool compare(all_of(check.begin(), check.end(), [](bool x){return x;}))//全ての要素がtrueならtrueを返す
 int main(){
-    
+    int n,k;
+    cin >> n >> k;
+    string s;
+    cin >> s;
+    sort(s.begin(),s.end());
+    ll ans = 0;
+    while(true){
+        bool ok = true;
+        for(int i=0;i<=n-k;i++){
+            bool flag = true;
+            for(int j=0;j<k;j++){
+                if(s[i+j] != s[i+k-1-j]) flag = false;
+            }
+            if(flag) ok = false;
+        }
+        if(ok) ans++;
+        if(!next_permutation(s.begin(),s.end())) break;
+    }
+    cout << ans << endl;
 }
