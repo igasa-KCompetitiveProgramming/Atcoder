@@ -18,46 +18,31 @@ bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfi
 int main(){
     int n,k;
     cin >> n >> k;
+    int cnt = 1;
     vector<int> r(n);
-    rep(i,n) cin >> r[n-i-1];
-    vector<int> a(n,1);
-    int ruiseki = n;
-    if(ruiseki % k == 0){
-        rep(i,n){
-            cout << 1 << " ";
-        }
+    rep(i,n){
+        cin >> r[i];
+        cnt *= r[i];
     }
-    cout << endl;
-    while(true){
-        if(a[n-1] >= r[n-1]+1) break;
-        a[0]++;
-        ruiseki++;
-        rep(i,n-1){
-            if(r[i] == 1){
-                ruiseki++;
-                a[i+1]++;
-                ruiseki -= a[i]-1;
-                a[i] = 1;
-            }
-            if(a[i] <= r[i]){
-                break;
+    vector<int> a(n);
+    rep(i,cnt){
+        int tmp = cnt / r[0];
+        int sum = 0;
+        int x = i;
+        rep(j,n){
+            if(r[j] != 1){
+                a[j] = x / tmp;
+                x %= tmp;
+                tmp /= r[j];
             }else{
-                ruiseki++;
-                ruiseki -= a[i]-1;
-                a[i] = 1;
-                a[i+1]++;
+                a[j] = 0;
             }
+            sum += a[j]+1;
         }
-        rep(i,n){
-            cout << a[n-i-1] << " ";
+        if(sum % k != 0) continue;
+        rep(j,n){
+            cout << a[j]+1 << " ";
         }
         cout << endl;
-        if(a[n-1] >= r[n-1]+1) break;
-        if(ruiseki % k == 0){
-            rep(i,n){
-                //cout << a[n-i-1] << " ";
-            }
-            //cout << endl;
-        }
     }
 }
