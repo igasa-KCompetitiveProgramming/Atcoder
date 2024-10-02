@@ -30,6 +30,7 @@ int dijkstra(int sx,int sy,int gx,int gy,char target){
         if(next.size() == 0){
             break;
         }
+        int tmp = get<0>(next.top());
         int ax = get<1>(next.top());
         int ay = get<2>(next.top());
         next.pop();
