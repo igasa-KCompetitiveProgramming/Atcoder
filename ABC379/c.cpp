@@ -4,9 +4,9 @@ using ll = long long;
 using pint = pair<int,int>;
 using pll = pair<long long, long long>;
 
-#define v(a,i) vector<ll> a(i)
+#define v(a,i,b) vector<ll> a(i,b)
 #define vv(a,i,j) vector<vector<ll>> a(i, vector<ll>(j))
-#define vp(a,i) vector<pll>> a(i)
+#define vp(a,i,b,c) vector<pll>> a(i,{b,c})
 #define vvp(a,i,j) vector<vector<pll>> a(i, vector<>>(j))
 
 #define rrep1(a)          for(ll i = (ll)(a-1); i >= (ll)0 ; i--)
@@ -71,44 +71,34 @@ int main(){
     rep(i,m){
         cin >> y[i].se;
     }
-    v(x,m);
-    v(a,m);
-    rep(i,m){
-        x[i] = y[i].fi;
+    sort(y.begin(),y.end());
+    if(y[m-1].fi != n-1){
+        y.pb({n,0});
+        m++;
     }
-    rep(i,m){
-        a[i] = y[i].se;
-    }
-    ll ans = 0;
-    v(check, m);
-    ll prev = 0;
     ll cnt = 0;
-    
-    ll cnt2 = 0;
-    rep(i,m-1){
-        if(x[i+1] - x[i] > a[i] + cnt2){
-            print(-1);
-            return 0;
-        }
-        cnt2 += a[i] - (x[i+1] - x[i]);
-    }
-
-    rrep(i,m){
-        check[i] = cnt;
-        cnt = 0;
-        check[i] += prev - x[i] - 1;
-        if(check[i] > a[i] - 1) cnt += check[i] - a[i];
-        prev = x[i];
-    }
-    if(cnt > 0){
-        print(-1);
+    if(y[0].fi != 0){
+        cout << -1 << endl;
         return 0;
     }
-    prev = 0;
-    rep(i,m - 1){
-        ans += (x[i+1] - x[i])*(x[i+1] - x[i] - 1)/2;
-        if(check[i] - a[i] > 0) ans += (x[i+1] - x[i])*(check[i] - a[i]);
+    ll check = 0;
+    rep(i,m){
+        check += y[i].se;
     }
-    ans += (n - x[m-1])*(n - x[m-1] - 1)/2;
+    if(check != n){
+        cout << -1 << endl;
+        return 0;
+    }
+    ll ans = 0;
+    rep(i,m-1){
+        if(cnt < 0){
+            cout << -1 << endl;
+            return 0;
+        }else{
+            ans += (y[i+1].fi - y[i].fi - 1) * (y[i+1].fi - y[i].fi) / 2;
+            ans += ((y[i].se + cnt) - (y[i+1].fi - y[i].fi))*(y[i+1].fi - y[i].fi);
+            cnt = y[i].se + cnt - (y[i+1].fi - y[i].fi);
+        }
+    }
     cout << ans << endl;
 }
