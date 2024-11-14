@@ -6,5 +6,7 @@
 *.plist
 
 .vscode
-
 *.exe
+*.txt
+*ds_store
+*tempCodeRunnerFile.cpp
