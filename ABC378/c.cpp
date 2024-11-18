@@ -17,9 +17,9 @@ int main(){
     rep(i,n){
         cin >> a[i];
         if(mp[a[i]] == -2){
-        cout << 1 << " ";
-        mp[a[i]] = i;
-        continue;
+            cout << 1 << " ";
+            mp[a[i]] = i;
+            continue;
         }
         if(!mp[a[i]]) cout << -1 << " ";
         else cout << mp[a[i]]+1 << " ";
