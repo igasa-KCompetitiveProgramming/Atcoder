@@ -10,3 +10,8 @@
 *.txt
 *ds_store
 *tempCodeRunnerFile.cpp
+
+/pahcer
+/Debug
+*.toml
+*/tools
