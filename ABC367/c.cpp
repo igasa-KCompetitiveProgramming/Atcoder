@@ -1,48 +1,99 @@
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;
-using ull = unsigned long long;
 using pint = pair<int,int>;
 using pll = pair<long long, long long>;
 
-#define rep(i, n) for (int i = 0; i < (int)(n); i++)
-#define rep1(i,n) for (int i = 1; i <= (int)(n); i++)
-#define YesNo(bool) if(bool) cout << "Yes" << endl; else cout << "No" << endl 
-#define YESNO(bool) if(bool) cout << "YES" << endl; else cout << "NO" << endl 
+#define v(a,i,b) vector<ll> a(i,b)
+#define vv(a,i,j,b) vector<vector<ll>> a(i, vector<ll>(j,b))
+#define vp(a,i,b,c) vector<pll>> a(i,{b,c})
+#define vvp(a,i,j,b,c) vector<vector<pll>> a(i, vector<>>(j,{b,c}))
+
+#define rrep1(a)          for(ll i = (ll)(a-1); i >= (ll)0 ; i--)
+#define rrep2(i, a)       for(ll i = (ll)(a-1); i >= (ll)0; i--)
+#define rrep3(i, a, b)    for(ll i = (ll)(a-1); i >=(b); i--)
+#define rrep4(i, a, b, c) for(ll i = (ll)(a-1); i >=(b); i -= (c))
+#define overload4(a, b, c, d, e, ...) e
+#define rrep(...) overload4(__VA_ARGS__, rrep4, rrep3, rrep2, rrep1)(__VA_ARGS__)
+
+#define rep1(a)          for(ll i = 0; i < (ll)(a); i++)
+#define rep2(i, a)       for(ll i = 0; i < (ll)(a); i++)
+#define rep3(i, a, b)    for(ll i = (a); i < (ll)(b); i++)
+#define rep4(i, a, b, c) for(ll i = (a); i < (ll)(b); i += (c))
+#define overload4(a, b, c, d, e, ...) e
+#define rep(...) overload4(__VA_ARGS__, rep4, rep3, rep2, rep1)(__VA_ARGS__)
+
+#define fi first
+#define se second
+#define pb push_back
+#define spa " "
+
+//！？！？
+#define O print
+
+inline void scan(){}
+template<class Head,class... Tail>
+inline void scan(Head&head,Tail&... tail){std::cin>>head;scan(tail...);}
+#define LL(...) ll __VA_ARGS__;scan(__VA_ARGS__)
+#define STR(...) string __VA_ARGS__;scan(__VA_ARGS__)
+
+//vectorのcin,cout
+template<typename T>
+std::istream &operator>>(std::istream&is,std::vector<T>&v){for(T &in:v){is>>in;}return is;}
+template<typename T>
+std::ostream &operator<<(std::ostream&os,const std::vector<T>&v){for(auto it=std::begin(v);it!=std::end(v);){os<<*it<<((++it)!=std::end(v)?" ":"");}return os;}
+//dequeのcin,cout
+template<typename T>
+std::istream &operator>>(std::istream&is,std::deque<T>&v){for(T &in:v){is>>in;}return is;}
+template<typename T>
+std::ostream &operator<<(std::ostream&os,const std::deque<T>&v){for(auto it=std::begin(v);it!=std::end(v);){os<<*it<<((++it)!=std::end(v)?" ":"");}return os;}
+//pairのcin,cout
+template<typename T,typename U>
+std::ostream &operator<<(std::ostream&os,const std::pair<T,U>&p){os<<p.first<<" "<<p.second;return os;}
+template<typename T,typename U>
+std::istream &operator>>(std::istream&is,std::pair<T,U>&p){is>>p.first>>p.second;return is;}
+//vector<vector<T>>のcout
+template<typename T>
+std::ostream &operator<<(std::ostream &os, const std::vector<std::vector<T>> &v) {
+for (const auto &row : v) {for (auto it = row.begin(); it != row.end(); ++it) { os << *it; if (std::next(it) != row.end()) { os << " "; } } os << "\n";} return os;}
+
+#pragma GCC diagnostic ignored "-Wunused-value"
+void print(){cout << '\n';}
+template<class T, class... Ts>
+void print(const T& a, const Ts&... b){cout << a;(std::cout << ... << (cout << ' ', b));cout << '\n';}
+#pragma GCC diagnostic warning "-Wunused-value"
+
 int inf = 2147483647; // おおよそ2*10^9
 ll INF = 9223372036854775807; //おおよそ9*10^18
 //ull UINF == おおよそ1.8*10^19
-bool compare(pint& p1, pint& p2){return p1.second < p2.second;}
-bool compare(pll& p1, pll& p2){return p1.second < p2.second;}//secondの値でfirstをsort
-//bool compare(all_of(check.begin(), check.end(), [](bool x){return x;}))//全ての要素がtrueならtrueを返す
 int main(){
-    int n,k;
-    cin >> n >> k;
-    int cnt = 1;
-    vector<int> r(n);
-    rep(i,n){
-        cin >> r[i];
+    LL(n,k);
+    v(r,n,0);
+    rep(n) cin >> r[n-i-1];
+    ll cnt = 1;
+    v(a,n,1);
+    rep(n){
         cnt *= r[i];
     }
-    vector<int> a(n);
-    rep(i,cnt){
-        int tmp = cnt / r[0];
-        int sum = 0;
-        int x = i;
+    rep(cnt){
+        ll res = 0;
         rep(j,n){
-            if(r[j] != 1){
-                a[j] = x / tmp;
-                x %= tmp;
-                tmp /= r[j];
-            }else{
-                a[j] = 0;
+            res += a[j];
+        }
+        if(res % k == 0){
+            rep(j,n){
+                cout << a[n-j-1] << spa;
             }
-            sum += a[j]+1;
         }
-        if(sum % k != 0) continue;
-        rep(j,n){
-            cout << a[j]+1 << " ";
+        a[0]++;
+        rep(j,n-1){
+            if(a[j] >= r[j] + 1){
+                a[j] = 1;
+                a[j+1]++;
+            }else{
+                break;
+            }
         }
-        cout << endl;
     }
+
 }
