@@ -41,6 +41,7 @@
 
 - 左上固定は確定
 - 右に伸ばすか左に伸ばすかは決めてない
+  - これ各段の高さを保管してるやつのsizeで入れられるかどうかを確認できればいいんじゃないの？
 
 ## 計算量はどの程度になると予測しますか？
 
@@ -58,3 +59,96 @@
 ## 実評価の話
 
 - maxH,maxWがわかっていれば漸次出るh,wで評価は簡単
+
+# 実装します、詳細な概要をお願いします
+
+- 初期解を作ります(別途参考)
+  - 各長方形の右下のx座標、その状態に持っていくための操作、最終的なスコアを保管します
+  - y座標は全長方形の高さを全て保存しておきます。
+    - setにぶち込み、最高の高さを見つけたところで打ち切りとする
+      - 計算量は段の個数なので想定は高さの発見に1~10、挿入にlog(N)と見ています
+  - 高さをmaxHを超えないように作成するのは良いのではないでしょうかというポエム
+  - 作成された経路を基にし、以下のように解を変えていきます
+  - 1. 右にベタ付けしたものを左端に積み上げる、という操作を行えるならば、行ってみる
+    - 変更した際、それまでのものを別のベクターを用意し、コピー
+  - 2. その先の解を初期解を作成した時と同様に求める
+  - 3. もし、H+Wが更新できそうであれば更新する
+- 以上の操作を1~1.5秒間繰り返します
+
+## 初期解の作り方について
+
+- 初期解として先に下積めはなしの方向で
+
+- 最初の1個を元の状態で置きます
+- 以下の操作を繰り返し続けます
+  - 各段について以下の操作を行い、どの操作が最も平らに置くことができるのかを精査します
+    - 最も右にある長方形の右に長方形を置く
+  - もし、最も左の長方形の下に積み下げることができるならば、その場合も比較
+
+## 現状の最強？コード
+
+```
+int main(){
+    LL(n,t,sgm);
+    v(w,n,0);v(h,n,0);
+    vector<bool> isVertical(n, false);
+    v(wSee,n,0);v(hSee,n,0);
+    rep(n) cin >> wSee[i] >> hSee[i];
+    rep(n) cin >> w[i] >> h[i];
+    ll areaSum = 0;
+    rep(n){
+        areaSum += w[i] * h[i];
+        if(w[i] < h[i]){
+            isVertical[i] = true;
+            swap(w[i], h[i]);
+        }
+    }
+    ll length = sqrt(areaSum);
+    ll cnt = 0;
+    bool flag = true;
+    ll t2 = t/2;
+    rep(j,t2){
+        cout << n << endl;
+        rep(i,n){
+            cout << i << spa;
+            cnt += w[i];
+            if(isVertical[i]) cout << 1 << spa;
+            else cout << 0 << spa;
+            cout << "U" << spa;
+            if(flag){
+                cout << "-1" << endl;
+                flag = false;
+            }else{
+                cout << i-1 << endl;
+            }
+            if(cnt > length){
+                flag = true;
+                cnt = 0;
+            }
+        }
+        cout << endl;
+    }
+    flag = true;
+    rep(t - t2){
+        cout << n << endl;
+        rep(j,n){
+            cout << j << spa;
+            cnt += w[j];
+            if(!isVertical[j]) cout << 1 << spa;
+            else cout << 0 << spa;
+            cout << "L" << spa;
+            if(flag){
+                cout << "-1" << endl;
+                flag = false;
+            }else{
+                cout << j-1 << endl;
+            }
+            if(cnt > length){
+                flag = true;
+                cnt = 0;
+            }
+        }
+        cout << endl;
+    }
+}
+```
