@@ -69,8 +69,7 @@ ll INF = 9223372036854775807; //おおよそ9*10^18
 
 ll countPrint = 0;
 ll t;
-ll avr = 0;
-
+ll IdealLength = 0;
 class RectanglePlacement {
 private:
     vector<vector<ll>> wh; // Rectangle dimensions
@@ -155,7 +154,7 @@ private:
                 pushbackRoute(route, i, i-1, true, sumH, avrNum, wh[i][1], wh[i][0], wideLength);
             }
         }
-        rep(route.size()) ans[i] = route[i];
+        ans = route;
     }
 
     void improveAnswer(){
@@ -165,6 +164,7 @@ private:
         rectangleInfo.clear();
         heightInfo.clear();
         rectangleInfo.resize(n, {0, 0});
+        ll fullWideLengthIndex = 0;
 
         vector<ll> newLeftSideRectangle;
         newLeftSideRectangle.push_back(0);
@@ -174,7 +174,7 @@ private:
             ll randNum = rand() % (leftSideRectangle[i] - minRand) + minRand;
             newLeftSideRectangle.push_back(randNum);
             sumHeight += wh[randNum][1];
-            minRand = randNum + 1;
+            minRand = leftSideRectangle[i];
             if(sumHeight > lateMaxHW[0]){
                 break;
             }
@@ -185,10 +185,13 @@ private:
         vector<ll> wideLengths;
         vector<ll> sumHeights, avrNums;
         vector<ll> selectLeftSideRectangle;
-        wideLengths.pb(wh[0][0]);
-        sumHeights.pb(wh[0][1]); avrNums.pb(1);
-        rectangleInfo[0] = {wh[0][0], wh[0][1]};
-        heightInfo.insert({wh[0][1], 0, wh[0][0], 0});
+        bool doTurn = false;
+        if(wh[0][0] > wh[0][1]) doTurn = true;
+        if(turn < t/2) doTurn = !doTurn;
+        wideLengths.pb(wh[0][doTurn]);
+        sumHeights.pb(wh[0][!doTurn]); avrNums.pb(1);
+        rectangleInfo[0] = {wh[0][doTurn], wh[0][!doTurn]};
+        heightInfo.insert({wh[0][!doTurn], 0, wh[0][doTurn], 0});
         selectLeftSideRectangle.push_back(0);
 
         ll leftSideRectangleIndex = 1;
@@ -196,27 +199,25 @@ private:
         //cout << "# ";
         //O(newLeftSideRectangle);
 
+
         rep(i,1,n){
-            //if(max(maxH, maxW) > avr + max(lateMaxHW[0], lateMaxHW[1])){
-              //  return;
-            //}
+            if(max(maxH, maxW) > (long double)idealLength * 1.3) return;
             if(newLeftSideRectangle[leftSideRectangleIndex] == i){
-                if(wideLengths[wideLengths.size()-1] < min(wh[i][0], wh[i][1])){
-                    newLeftSideRectangle[leftSideRectangleIndex-1]++;
-                }else{
+                //if((ll)((long double)wideLengths[wideLengths.size() - 1] / 1.5) < min(wh[i][0],wh[i][1])){
+                  //  newLeftSideRectangle[leftSideRectangleIndex]++;
+                //}else{
                     route.push_back({i, 0, 'U', -1});
                     selectLeftSideRectangle.push_back(i);
                     leftSideRectangleIndex++;
-                    bool Turned = false;
-                    if(wideLengths[wideLengths.size()-1] < wh[i][0]) Turned = true;
-                    ll ifTurn = Turned;
-                    wideLengths.pb(wh[i][ifTurn]);
-                    sumHeights.pb(wh[i][!ifTurn]); avrNums.pb(1);
-                    ll aboveHeight = findAboveHeight(0, wh[i][ifTurn]);
-                    rectangleInfo[i] = {wh[i][ifTurn], wh[i][!ifTurn] + rectangleInfo[aboveHeight].se};
-                    heightInfo.insert({wh[i][!ifTurn] + rectangleInfo[aboveHeight].se, 0, wh[i][ifTurn], i});
+                    if(wh[i][0] > wh[i][1]) doTurn = true;
+                    if(turn < n/2) doTurn = !doTurn;
+                    wideLengths.pb(wh[i][doTurn]);
+                    sumHeights.pb(wh[i][!doTurn]); avrNums.pb(1);
+                    ll aboveHeight = findAboveHeight(0, wh[i][doTurn]);
+                    rectangleInfo[i] = {wh[i][doTurn], wh[i][!doTurn] + rectangleInfo[aboveHeight].se};
+                    heightInfo.insert({wh[i][!doTurn] + rectangleInfo[aboveHeight].se, 0, wh[i][doTurn], i});
                     continue;
-                }
+            //    }
             }
 
             ll minDifference = inf;
@@ -225,7 +226,7 @@ private:
 
             //cout << "# ";
 
-            rrep(j,selectLeftSideRectangle.size()){
+            rep(j,selectLeftSideRectangle.size()){
                 if(wideLengths[j] >= lateMaxHW[0]) continue;
                 if(wideLengths[j] >= idealLength) continue;
                 if(j != 0) if(wideLengths[j] + wh[i][0] > wideLengths[j-1]) continue;
@@ -243,7 +244,7 @@ private:
 
             if(minIndex == -1){
                 route.push_back({i, 0, 'U', -1});
-                newLeftSideRectangle.erase(newLeftSideRectangle.end());
+                leftSideRectangleIndex++;
                 selectLeftSideRectangle.push_back(i);
 
                 wideLengths.pb(wh[i][0]);
@@ -255,6 +256,9 @@ private:
                 maxW = max(maxW, rectangleInfo[i].first);
                 continue;
             }
+
+            if(wh[i][0] < wh[i][1]) isTurn = true;
+            else isTurn = false;
 
             pushbackRoute(route, i, selectLeftSideRectangle[minIndex], isTurn, sumHeights[minIndex], avrNums[minIndex], wh[i][isTurn], wh[i][!isTurn], wideLengths[minIndex]);
             
@@ -270,22 +274,17 @@ private:
         if(sumResult < maxSumResult){
             //improveCount++;
             maxSumResult = sumResult;
-            rep(route.size())            
-            //cout << "# improve print" << endl;
-            if(turn > 1){
-                //cout << "# test" << t - turn << spa << maxSumResult << endl;
-                rep(route.size()) ans[i] = route[i];
-                //turn--;
-                printResult(1);
-            }
+            ans = route;
+            if(turn > 1) printResult(1);
         }else{
-            if(turn > 5){
-                rep(route.size()) ans[i] = route[i];
-                //cout << "# test" << t-turn << spa << sumResult << endl;
-                printResult(1);
-            }
             maxH = lateMaxHW[0];
             maxW = lateMaxHW[1];
+            //if(turn > t/4){
+              //  ans = route;
+                //maxH = lateMaxHW[0];
+                //maxW = lateMaxHW[1];
+                //printResult(1);
+            //}
         }
     }
 
@@ -293,7 +292,6 @@ public:
     ll turn;
     RectanglePlacement(ll n, ll t, vector<vector<ll>> dimensions) : n(n), wh(dimensions) {
         turn = t;
-        ans.resize(n);
         resultHW.resize(n, vector<ll>(2));
         rectangleInfo.resize(n);
         idealLength = 0;
@@ -301,7 +299,9 @@ public:
             idealLength += dim[0] * dim[1];
         }
         idealLength = sqrt(idealLength);
-        idealLength = (long double)idealLength * (1 + 0.2 * (n - 50)/100); 
+        IdealLength = idealLength;
+        idealLength *= (long double)1 + 0.2 * (((long double)n - (long double)30)/(long double)100);
+        //cout << idealLength << endl;
     }
 
     void compute() {
@@ -318,12 +318,10 @@ public:
         /*rep(rectangleInfo.size()) {
             cout << "# " << rectangleInfo[i].first << " " << rectangleInfo[i].second << endl;
         }*/
-        
         rep(t){
-            countPrint++;
-            cout << ans.size() << endl;
-            rep(j,ans.size()){
-                cout << get<0>(ans[j]) << " " << get<1>(ans[j]) << " " << get<2>(ans[j]) << " " << get<3>(ans[j]) << endl;
+            cout << n << endl;
+            for (const auto &[i, j, c, p] : ans) {
+                cout << i << " " << j << " " << c << " " << p << endl;
             }
         }
     }
@@ -336,15 +334,12 @@ int main() {
     vector<vector<ll>> dimensions(n, vector<ll>(2));
     for (ll i = 0; i < n; ++i) {
         cin >> dimensions[i][0] >> dimensions[i][1];
-        avr += dimensions[i][0] + dimensions[i][1];
     }
-    avr /= n*2;
 
     RectanglePlacement rp(n, t, dimensions);
     rp.compute();
-    //cout << "# firstprint" << endl;
     rp.printResult(1);
-    while((clock() - timer) / (long double)CLOCKS_PER_SEC < 2.7){
+    while((clock() - timer) / (long double)CLOCKS_PER_SEC < 2.8){
         rp.inproving();
     }
 
