@@ -66,10 +66,15 @@ void print(const T& a, const Ts&... b){cout << a;(std::cout << ... << (cout << '
 int inf = 2147483647; // おおよそ2*10^9
 ll INF = 9223372036854775807; //おおよそ9*10^18
 //ull UINF == おおよそ1.8*10^19
+map<string,ll> patternMap;
 
 ll countPrint = 0;
 ll t;
 ll IdealLength = 0;
+
+bool flag = false;
+
+int timer;
 class RectanglePlacement {
 private:
     vector<vector<ll>> wh; // Rectangle dimensions
@@ -169,16 +174,31 @@ private:
         vector<ll> newLeftSideRectangle;
         newLeftSideRectangle.push_back(0);
         ll minRand = 1; ll sumHeight = wh[0][1];
-        rep(leftSideRectangle.size()){
-            //minRandからleftSideRectangle[i]までの乱数を生成
-            ll randNum = rand() % (leftSideRectangle[i] - minRand) + minRand;
-            newLeftSideRectangle.push_back(randNum);
-            sumHeight += wh[randNum][1];
-            minRand = leftSideRectangle[i];
-            if(sumHeight > lateMaxHW[0]){
+        string pattern;
+        while((clock() - timer) / (long double)CLOCKS_PER_SEC < 2.8){
+            pattern.clear();
+            newLeftSideRectangle.clear(); newLeftSideRectangle.push_back(0);
+            minRand = 1; sumHeight = wh[0][1];
+            rep(leftSideRectangle.size()){
+                //minRandからleftSideRectangle[i]までの乱数を生成
+                ll randNum = rand() % (leftSideRectangle[i] - minRand - 1) + minRand + 1;
+                if(randNum < 10) pattern += "0" + to_string(randNum);
+                else pattern += to_string(randNum);
+                newLeftSideRectangle.push_back(randNum);
+                sumHeight += wh[randNum][1];
+                minRand = leftSideRectangle[i];
+                if(sumHeight > lateMaxHW[0]){
+                    break;
+                }
+            }
+            //cout << pattern << spa;
+            if(patternMap[pattern] == -1) continue;
+            else{
+                patternMap[pattern] = -1;
                 break;
             }
         }
+        //cout << "here" << endl;
 
         vector<tuple<ll, ll, char, ll>> route;
         route.push_back({0, 0, 'U', -1});
@@ -309,6 +329,8 @@ public:
     }
 
     void inproving(){
+        //if(flag) idealLength = IdealLength;
+        //else idealLength = IdealLength * (long double)1 + 0.2 * (((long double)n - (long double)30)/(long double)100);
         improveAnswer();
     }
 
@@ -328,7 +350,7 @@ public:
 };
 
 int main() {
-    int timer = clock();
+    timer = clock();
     LL(n,cint,sgm);
     t = cint;
     vector<vector<ll>> dimensions(n, vector<ll>(2));
