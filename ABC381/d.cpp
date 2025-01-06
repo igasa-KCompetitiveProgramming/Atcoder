@@ -71,37 +71,17 @@ int main(){
     LL(n);
     v(a,n,0);
     rep(n) cin >> a[i];
-    vector<ll> mp2(n,-1);
-    queue<ll> q;
-    ll l = -1;
-    ll ans = 0;
-    ll cnt = 0;
+    v(b,0,0);
     rep(n-1){
-        if(i+1 > n-1) break;
         if(a[i] == a[i+1]){
-            if(l == -1) l = i;
-            if(mp2[a[i]] != -1){
-                l = max(l, mp2[a[i]]+1);
-            }
-            mp2[a[i]] = cnt;
-            q.push(a[i]);
-            cnt++;
+            b.pb(a[i]);
             i++;
-            //O(l,cnt,cnt-l,ans);
-            ans = max(ans, cnt-l);
         }else{
-            l = 0;
-            cnt = 0;
-            while(!q.empty()){
-                mp2[q.front()] = -1;
-                q.pop();
-            }
-            if(i == 0) continue;
-            if(a[i-1] == a[i]){
-                l = cnt-1;
-                i -= 2;
-            }
+            while(i < n-1 && a[i] != a[i+1]) i++;
+            b.pb(-1);
+            b.pb(a[i]);
+            i++;
         }
     }
-    O(ans*2);
+    O(b);
 }
