@@ -4,11 +4,6 @@ using ll = long long;
 using pint = pair<int,int>;
 using pll = pair<long long, long long>;
 
-#define v(a,i,b) vector<ll> a(i,b)
-#define vv(a,i,j,b) vector<vector<ll>> a(i, vector<ll>(j,b))
-#define vp(a,i,b,c) vector<pll>> a(i,{b,c})
-#define vvp(a,i,j,b,c) vector<vector<pll>> a(i, vector<>>(j,{b,c}))
-
 #define rrep1(a)          for(ll i = (ll)(a-1); i >= (ll)0 ; i--)
 #define rrep2(i, a)       for(ll i = (ll)(a-1); i >= (ll)0; i--)
 #define rrep3(i, a, b)    for(ll i = (ll)(a-1); i >=(b); i--)
@@ -67,71 +62,61 @@ int inf = 2147483647; // おおよそ2*10^9
 ll INF = 9223372036854775807; //おおよそ9*10^18
 //ull UINF == おおよそ1.8*10^19
 
-const vector<ll> dy = {1,-1,0,0};
-const vector<ll> dx = {0,0,-1,1};
-
-string s = "UDLR";
+string s = "URLD";
+const vector<ll> dx = {0,1,-1,0};
+const vector<ll> dy = {1,0,0,-1};
 
 int main(){
     LL(n,m,x,y);
-    vector<pll> p;
-    vector<ll> c(m);
-    vector<char> d(n);
-    map<ll,set<ll>> setterX, setterY;
+    map<ll,set<ll>> h,w;
     rep(n){
-        ll tmp,res;
-        cin >> tmp >> res;
-        p.push_back({tmp,res});
-        setterX[res].insert(tmp);
-        setterY[tmp].insert(res);
-    }  
-    
-
-
-    rep(m) cin >> d[i] >> c[i];
+        LL(a,b);
+        h[a].insert(b);
+        w[b].insert(a);
+    }
     ll ans = 0;
-    ll nx = x; ll ny = y;
+
     rep(m){
-        rep(j,4){
-            if(d[i] == s[j]){
-                x = nx; y = ny;
-                nx = x + dx[j] * c[i];
-                ny = y + dy[j] * c[i];
-                //cout << "i " << i << spa << nx << spa << ny << endl;
-                //cout << "test" << setterX[1].size() << endl;
-                if(j > 1){
-                    //cout << ny << spa << min(x,nx) << spa << max(x,nx) << endl;
-                    auto l = setterX[ny].lower_bound(min(x,nx));
-                    auto r = setterX[ny].upper_bound(max(x,nx));
-                    if(l == setterX[ny].end()) continue;
-                    if(*l > *r) continue;
-                    vector<ll> tmp;
-                    for(auto it = l; it != r; it++){
-                        tmp.push_back(*it);
-                        ans++;
-                    }
-                    rep(tmp.size()){
-                        setterX[ny].erase(tmp[i]);
-                        setterY[tmp[i]].erase(ny);
-                    }
-                }else{
-                    auto l = setterY[nx].lower_bound(min(y,ny));
-                    auto r = setterY[nx].upper_bound(max(y,ny));
-                    //cout << *l << spa << *r << endl;
-                    if(l == setterY[nx].end()) continue;
-                    if(*l > *r) continue;
-                    vector<ll> tmp;
-                    for(auto it = l; it != r; it++){
-                        tmp.push_back(*it);
-                        ans++;
-                    }
-                    rep(tmp.size()){
-                        setterY[nx].erase(tmp[i]);
-                        setterX[tmp[i]].erase(nx);
-                    }
-                }
+        char c;
+        ll d;
+        cin >> c >> d;
+        if(c == 'U'){
+            ll next = y + d;
+            auto it = h[x].upper_bound(y);
+            while(it != h[x].end() && *it <= next){
+                ans++;
+                w[*it].erase(x);
+                it = h[x].erase(it);
             }
+            y = next;
+        }else if(c == 'D'){
+            ll next = y - d;
+            auto it = h[x].lower_bound(next);
+            while(it != h[x].end() && *it <= y){
+                ans++;
+                w[*it].erase(x);
+                it = h[x].erase(it);
+            }
+            y = next;
+        }else if(c == 'R'){
+            ll next = x + d;
+            auto it = w[y].upper_bound(x);
+            while(it != w[y].end() && *it <= next){
+                ans++;
+                h[*it].erase(y);
+                it = w[y].erase(it);
+            }
+            x = next;
+        }else if(c == 'L'){
+            ll next = x - d;
+            auto it = w[y].lower_bound(next);
+            while(it != w[y].end() && *it <= x){
+                ans++;
+                h[*it].erase(y);
+                it = w[y].erase(it);
+            }
+            x = next;
         }
     }
-    cout << nx << spa << ny << spa << ans << endl;
+    cout << x << spa << y << spa << ans << endl;
 }
