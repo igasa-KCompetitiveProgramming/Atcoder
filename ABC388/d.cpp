@@ -71,16 +71,20 @@ int main(){
     LL(n);
     v(a,n,0);
     rep(n) cin >> a[i];
-    multiset<ll> s;
-    rep(n){
-        while(*s.begin() < i){
-            if(s.size() == 0) break;
-            s.erase(s.begin());
+    int left = -1;
+    int right = n/2 + 1; // rightは各自設定
+    while(right - left > 1){ //rightは配列[mid]より小さい最大値に、leftは配列[mid]より大きい最小値になる
+        int mid = left + (right - left) / 2;
+        bool ok = true;
+        rep(mid){
+            if(a[i] * 2 > a[n - mid + i]){
+                ok = false;
+                break;
+            }
         }
-        a[i] += s.size();
-        ll r = i + min(a[i],n-i-1);
-        s.insert(r);
-        a[i] = max(0ll,a[i] - n + i + 1);
+        if(ok) left = mid;
+        else right = mid;
+        if(right < left) break;
     }
-    rep(n) cout << a[i] << spa;
+    cout << left << endl;
 }
