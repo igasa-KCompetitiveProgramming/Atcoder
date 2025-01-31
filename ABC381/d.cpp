@@ -71,17 +71,50 @@ int main(){
     LL(n);
     v(a,n,0);
     rep(n) cin >> a[i];
-    v(b,0,0);
-    rep(n-1){
-        if(a[i] == a[i+1]){
-            b.pb(a[i]);
+    ll maxAns = 0;
+    ll ans = 0;
+    map<ll,ll> mp;
+    rep(n){
+        mp[a[i]] = -1;
+    }
+    queue<ll> q;
+    rep(i,1,n){
+        //cout << i << endl;
+        //cout << ans << spa << maxAns << spa << mp[a[i]] << endl;
+        if(a[i] == a[i-1]){
+            if(mp[a[i]] != -1){
+                maxAns = max(maxAns,ans);
+                //cout << i << spa << a[i] << spa << mp[a[i]] << spa;
+                ans = i - mp[a[i]];
+                //cout << ans << endl;
+                while(!q.empty()){
+                    if(q.front() == a[i]){
+                        q.pop();
+                        break;
+                    }
+                    mp[q.front()] = -1;
+                    q.pop();
+                }
+            }else ans += 2;
+            mp[a[i]] = i;
+            q.push(a[i]);
             i++;
         }else{
-            while(i < n-1 && a[i] != a[i+1]) i++;
-            b.pb(-1);
-            b.pb(a[i]);
-            i++;
+            maxAns = max(maxAns,ans);
+            ans = 0;
+            while(!q.empty()){
+                mp[q.front()] = -1;
+                q.pop();
+            }
+            if(i < 2) continue;
+            if(a[i-1] == a[i-2]){
+                ans += 2;
+                mp[a[i-1]] = i-1;
+                q.push(a[i-1]);
+                continue;
+            }
         }
     }
-    O(b);
+    maxAns = max(maxAns,ans);
+    O(maxAns);
 }
