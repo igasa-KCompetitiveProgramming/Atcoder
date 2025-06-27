@@ -38,266 +38,133 @@ template<class T, class... Ts>
 void print(const T& a, const Ts&... b){cout << a;(std::cout << ... << (cout << ' ', b));cout << '\n';}
 #pragma GCC diagnostic warning "-Wunused-value"
 
-int inf = 2147483647; // おおよそ2*10^9
-ll INF = 9223372036854775807; //おおよそ9*10^18
+//int INF = 2147483647; // おおよそ2*10^9
+ll inf = 1LL<<60; //おおよそ10^18
 //ull UINF == おおよそ1.8*10^19
 
-clock_t start;
+vector<ll> dx = {1, 0, -1, 0};
+vector<ll> dy = {0, 1, 0, -1};
+string d = "DRUL";
+map<char,char> reverse_d = {
+    {'D', 'U'},
+    {'R', 'L'},
+    {'U', 'D'},
+    {'L', 'R'}
+};
 
-string d = "UDLR";
-vector<ll> dx = {0,0,-1,1};
-vector<ll> dy = {-1,1,0,0};
-
-class s{
+class SOLVE{
   public:
-    ll n,m;
+    ll n, m;
     vector<pll> goal;
-    vector<vector<ll>> field;
+    vector<pair<char, char>> answer;
 
-    pll now;
-    vector<pair<char,char>> ans;
-    vector<pair<char,char>> final_ans;
-    set<ll> goal_set;
-    vector<char> goal_dir;
+    vector<bool> usedBox;
+
 
     void input(){
         cin >> n >> m;
         goal.resize(m);
-        field.resize(n, vector<ll>(n));
-        goal_dir.resize(m);
-        rep(m) cin >> goal[i].fi >> goal[i].se;
-        rep(m){
-            if(i == 0) continue;
-            field[goal[i].fi][goal[i].se] = i;
+        rep(i, m){
+            cin >> goal[i].fi >> goal[i].se;
         }
+
+        usedBox.resize(m, false);
     }
 
-    void check(char dir, vector<bool> use){
-        if(field[now.fi][now.se] > 0){
-            if(!use[field[now.fi][now.se]]) return;
-            char rev;
-            if(dir == 'U') rev = 'D';
-            else if(dir == 'D') rev = 'U';
-            else if(dir == 'L') rev = 'R';
-            else if(dir == 'R') rev = 'L';
-            ans.pb({'A',rev});
-            field[now.fi][now.se] = 0;
-        }
-    }
-
-    void slide(ll &i, ll &j, char dir){
-        ans.pb({'S',dir});
-        rep(k,d.size()){
-            if(d[k] == dir){
-                while(true){
-                    if(now.fi + dy[k] < 0 || now.fi + dy[k] >= n || now.se + dx[k] < 0 || now.se + dx[k] >= n) break;
-                    if(field[i + dy[k]][j + dx[k]] < 0) break;
-                    now.fi = i + dy[k];
-                    now.se = j + dx[k];
+    void dijkstra(){
+        vector<vector<int>> field(n,vector<int>(n,-1));
+        rep(i, m - 1){
+            vector<vector<pair<pair<char,char>, pll>>> prev(n,vector<pair<pair<char,char>,pll>>(n, {{'-','-'},{-1,-1}}));
+            priority_queue<tuple<ll, pll, pll, pair<char, char>>, vector<tuple<ll, pll, pll, pair<char, char>>>, greater<tuple<ll, pll, pll, pair<char, char>>>> pq;
+            vector<vector<bool>> visited(n, vector<bool>(n, false));
+            prev[goal[i].fi][goal[i].se] = {{'s','s'},{-1,-1}};
+            pq.push({0, {goal[i]}, {-1,-1}, {'-','-'}});
+            while(!pq.empty()){
+                field[goal[i].fi][goal[i].se] = i;
+                auto[dist, tmp, before, res] = pq.top();
+                ll x = tmp.fi;
+                ll y = tmp.se;
+                pq.pop();
+                if(visited[x][y]) continue;
+                visited[x][y] = true;
+                prev[x][y] = {res, before};
+                if(x == goal[i + 1].fi && y == goal[i + 1].se){
+                    //cout << spa << goal[i + 1].fi << ' ' << goal[i + 1].se << endl;
+                    break;
+                }
+                rep(j,4){
+                    ll nx = x + dx[j];
+                    ll ny = y + dy[j];
+                    if(nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+                    if(field[nx][ny] == -1) continue;
+                    pq.push({dist + 1, {nx, ny}, {x, y}, {'M', d[j]}});
+                }
+                rep(j,4){
+                    ll nx = x;
+                    ll ny = y;
+                    while(true){
+                        ll cx = nx + dx[j];
+                        ll cy = ny + dy[j];
+                        if(cx < 0 || cx >= n || cy < 0 || cy >= n) break;
+                        if(field[cx][cy] != -1){
+                            usedBox[field[cx][cy]] = true;
+                            break;
+                        }
+                        nx = cx,ny = cy;
+                    }
+                    pq.push({dist + 1, {nx, ny}, {x, y}, {'S', d[j]}});
                 }
             }
-        }
-    }
-
-    void move(char dir, ll i, vector<bool> use){
-        rep(k,d.size()){
-            if(d[k] == dir){
-                if(now.fi + dy[k] < 0 || now.fi + dy[k] >= n || now.se + dx[k] < 0 || now.se + dx[k] >= n) return;
-                if(field[now.fi + dy[k]][now.se + dx[k]] < 0){
-                    ans.pb({'A',dir});
-                    field[now.fi + dy[k]][now.se + dx[k]] = 0;
-                }
-                ans.pb({'M',d[k]});
-                check(dir, use);
-                now.fi += dy[k];
-                now.se += dx[k];
+            vector<pair<char, char>> ans;
+            pll now = goal[i + 1];
+            while(true){
+                auto[res, before] = prev[now.fi][now.se];
+                //cout << before.fi << ' ' << before.se << endl;
+                if(res.fi == '-' && res.se == '-') break;
+                if(res.fi != 's' && res.se != 's') ans.pb(res);
+                now = before;
             }
-        }
-    }
-
-    bool near(char dir, pll g){
-        ll i = now.fi;
-        ll j = now.se;
-        pll cnt = {0,0};
-        if(dir == 'U' || dir == 'D') cnt.se = abs(i - g.fi);
-        else cnt.se = abs(j - g.se);
-        rep(k,d.size()){
-            if(d[k] == dir){
-                while(true){
-                    if(i + dy[k] < 0 || i + dy[k] >= n || j + dx[k] < 0 || j + dx[k] >= n) break;
-                    if(field[i + dy[k]][j + dx[k]] < 0) break;
-                    i = i + dy[k];
-                    j = j + dx[k];
+            //cout << ans.size() << endl;
+            bool flag = false;
+            if(ans.size() > 1) flag = true;
+            rep(j, ans.size()){
+                if(ans[j].fi == 'S'){
+                    flag = true;
+                    break;
                 }
             }
-        }
-        if(dir == 'U' || dir == 'D') cnt.fi = abs(i - g.fi);
-        else cnt.fi = abs(j - g.se);
-        if(cnt.fi < cnt.se) return true;
-        else return false;
-    }
-
-    void first(vector<bool> use){
-        now = goal[0];
-        rep(i,1,m){
-            field[goal[i].fi][goal[i].se] = 0;
-            pll g = goal[i];
-            if(now.fi != g.fi){
-                while(near('U', g)){
-                    if(now.fi - 1 >= 0){
-                        if(field[now.fi - 1][now.se] < 0){
-                            ans.pb({'A','U'});
-                            field[now.fi - 1][now.se] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'U');
+            if(flag){
+                if(ans[ans.size() - 1].fi == 'S'){
+                    ans.pb({'A', reverse_d[ans[ans.size() - 1].se]});
+                    ans.pb({'M', reverse_d[ans[ans.size() - 1].se]});
+                }else{
+                    char rev = reverse_d[ans[ans.size() - 1].se];
+                    ans.pop_back();
+                    ans.pb({'A', rev});
+                    ans.pb({'M', reverse_d[rev]});
                 }
-                while(near('D', g)){
-                    if(now.fi + 1 < n){
-                        if(field[now.fi + 1][now.se] < 0){
-                            ans.pb({'A','D'});
-                            field[now.fi + 1][now.se] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'D');
-                }
-                while(now.fi != g.fi){
-                    if(now.fi > g.fi){
-                        move('U', i, use);
-                    }else{
-                        move('D', i, use);
-                    }
-                }
+            }else{
+                field[goal[i].fi][goal[i].se] = false;
             }
-            if(now.se != g.se){
-                while(near('L', g)){
-                    if(now.se - 1 >= 0){
-                        if(field[now.fi][now.se - 1] < 0){
-                            ans.pb({'A','L'});
-                            field[now.fi][now.se - 1] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'L');
-                }
-                while(near('R', g)){
-                    if(now.se + 1 < n){
-                        if(field[now.fi][now.se + 1] < 0){
-                            ans.pb({'A','R'});
-                            field[now.fi][now.se + 1] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'R'); 
-                }
-                while(now.se != g.se){
-                    if(now.se < g.se){
-                        move('R', i, use);
-                    }else{
-                        move('L', i, use);
-                    }
-                }
+            //cout << ans.size() << endl;
+            reverse(ans.begin(), ans.end());
+            rep(j, ans.size()){
+                answer.pb(ans[j]);
             }
         }
     }
 
-    void first_2(vector<bool> use){
-        now = goal[0];
-        rep(i,1,m){
-            field[goal[i].fi][goal[i].se] = 0;
-            pll g = goal[i];
-            if(now.se != g.se){
-                while(near('L', g)){
-                    if(now.se - 1 >= 0){
-                        if(field[now.fi][now.se - 1] < 0){
-                            ans.pb({'A','L'});
-                            field[now.fi][now.se - 1] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'L');
-                }
-                while(near('R', g)){
-                    if(now.se + 1 < n){
-                        if(field[now.fi][now.se + 1] < 0){
-                            ans.pb({'A','R'});
-                            field[now.fi][now.se + 1] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'R'); 
-                }
-                while(now.se != g.se){
-                    if(now.se < g.se){
-                        move('R', i, use);
-                    }else{
-                        move('L', i, use);
-                    }
-                }
-            }
-            if(now.fi != g.fi){
-                while(near('U', g)){
-                    if(now.fi - 1 >= 0){
-                        if(field[now.fi - 1][now.se] < 0){
-                            ans.pb({'A','U'});
-                            field[now.fi - 1][now.se] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'U');
-                }
-                while(near('D', g)){
-                    if(now.fi + 1 < n){
-                        if(field[now.fi + 1][now.se] < 0){
-                            ans.pb({'A','D'});
-                            field[now.fi + 1][now.se] = 0;
-                        }
-                    }
-                    slide(now.fi, now.se, 'D');
-                }
-                while(now.fi != g.fi){
-                    if(now.fi > g.fi){
-                        move('U', i, use);
-                    }else{
-                        move('D', i, use);
-                    }
-                }
-            }
-        }
+    void improve(){
+
     }
 
-    void second(){
-        ll bit_ = 0;
-        while(clock() - start < 1.6 * CLOCKS_PER_SEC){
-            ll tmp = ans.size();
-            ans.clear();
-            vector<bool> use(m, false);
-            rep(m){ // bit全探索の順部
-                if(bit_ & (1 << i)){
-                    use[i] = true;
-                }
-            }
-            first(use);
-            if(ans.size() > tmp){
-                final_ans = ans;
-                tmp = ans.size();
-            }
-            first_2(use);
-            if(ans.size() > tmp){
-                final_ans = ans;
-                tmp = ans.size();
-            }
-            bit_++;
-        }
-    }
-
-    void solve(){
-        input();
-        second();
-        //cout << ans.size() << endl;
-        rep(final_ans.size()){
-            cout << final_ans[i].fi << spa << final_ans[i].se << endl;
-        }
+    void guess(){
+        rep(answer.size()) cout << answer[i].fi << spa << answer[i].se << endl;
     }
 };
 
 int main(){
-    start = clock();
-    s sol;
-    sol.solve();
+    SOLVE solve;
+    solve.input();
+    solve.dijkstra();
 }
