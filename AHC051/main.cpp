@@ -4,7 +4,7 @@
 #include <climits>
 #include <chrono>
 #include <cmath>
-
+#include <bits/stdc++.h>
 using namespace std;
 
 typedef pair<int, int> Point;
